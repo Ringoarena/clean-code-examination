@@ -25,7 +25,7 @@ public class Moo {
 		String name = gw.getString();
 		int id = 0;
 		Class.forName("com.mysql.jdbc.Driver");
-		connection = DriverManager.getConnection("jdbc:mysql://localhost/Moo","ulf","ulfpw");			
+		connection = DriverManager.getConnection("jdbc:mysql://localhost/cleancodeexam","root","root");
 		stmt = connection.createStatement();		
 		rs = stmt.executeQuery("select id,name from players where name = '" + name + "'");
 		if (rs.next()) {
