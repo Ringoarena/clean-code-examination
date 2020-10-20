@@ -14,45 +14,45 @@ public class Moo {
 	static Connection connection;
 	static Statement stmt;
 	static ResultSet rs;
-	static SimpleWindow gw;
+	static SimpleWindow GUI;
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, InterruptedException {
-		gw = new SimpleWindow("Moo");
+		GUI = new SimpleWindow("Moo");
 		int answer = JOptionPane.YES_OPTION;
 
 		// login
-		gw.addString("Enter your user name:\n");
-		String name = gw.getString();
+		GUI.addString("Enter your user name:\n");
+		String name = GUI.getString();
 		int id = 0;
 		Class.forName("com.mysql.jdbc.Driver");
 		connection = DriverManager.getConnection("jdbc:mysql://localhost/cleancodeexam","root","root");
-		stmt = connection.createStatement();		
+		stmt = connection.createStatement();
 		rs = stmt.executeQuery("select id,name from players where name = '" + name + "'");
 		if (rs.next()) {
 			id = rs.getInt("id");
 		} else {
-			gw.addString("User not in database, please register with admin");
+			GUI.addString("User not in database, please register with admin");
 			Thread.sleep(5000);
-			gw.exit();
+			GUI.exit();
 		}
 		
 		while (answer == JOptionPane.YES_OPTION) {
 			String goal = makeGoal();
-			gw.clear();
-			gw.addString("New game:\n");
+			GUI.clear();
+			GUI.addString("New game:\n");
 			//comment out or remove next line to play real games!
-			gw.addString("For practice, number is: " + goal + "\n");
-			String guess = gw.getString();
-			gw.addString(guess +"\n");
+			GUI.addString("For practice, number is: " + goal + "\n");
+			String guess = GUI.getString();
+			GUI.addString(guess +"\n");
 			int nGuess = 1;
 			String bbcc = checkBC(goal, guess);
-			gw.addString(bbcc + "\n");
+			GUI.addString(bbcc + "\n");
 			while ( ! bbcc.equals("BBBB,")) {
 				nGuess++;
-				guess = gw.getString();
-				gw.addString(guess +"\n");
+				guess = GUI.getString();
+				GUI.addString(guess +"\n");
 				bbcc = checkBC(goal, guess);
-				gw.addString(bbcc + "\n");
+				GUI.addString(bbcc + "\n");
 			}
 			int ok = stmt.executeUpdate("INSERT INTO results " + 
 					"(result, player) VALUES (" + nGuess + ", " +	id + ")" );
@@ -61,7 +61,7 @@ public class Moo {
 					+ " guesses\nContinue?");
 		
 		}
-		gw.exit();
+		GUI.exit();
 	}
 	
 	public static String makeGoal(){
@@ -132,11 +132,11 @@ public class Moo {
 			}
 			
 		}
-		gw.addString("Top Ten List\n    Player     Average\n");
+		GUI.addString("Top Ten List\n    Player     Average\n");
 		int pos = 1;
 		topList.sort((p1,p2)->(Double.compare(p1.average, p2.average)));
 		for (PlayerAverage p : topList) {
-			gw.addString(String.format("%3d %-10s%5.2f%n", pos, p.name, p.average));
+			GUI.addString(String.format("%3d %-10s%5.2f%n", pos, p.name, p.average));
 			if (pos++ == 10) break;
 		}
 

@@ -36,16 +36,19 @@ public class DAOImpl implements DAO {
         return user;
     }
 
-    public boolean tableExists(String tableName) {
+    public boolean tableExists() {
         try {
-            return connection.getMetaData().getTables(null, null, tableName, null).next();
+            boolean exists = connection.getMetaData().getTables(null, null, getTableName(), null).next();
+            System.out.println("Table " + getTableName() + " exists: " + exists);
+            return exists;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void createTable(String tableName) {
-        String sql = "CREATE TABLE `cleancodeexam`.`" + tableName + "` (" +
+    public void createTable() {
+        System.out.println("Creating table " + getTableName() + "...");
+        String sql = "CREATE TABLE `cleancodeexam`.`" + getTableName() + "` (" +
                 "  `id` INT NOT NULL AUTO_INCREMENT," +
                 "  `result` INT NOT NULL," +
                 "  `player` INT NULL," +
@@ -59,12 +62,15 @@ public class DAOImpl implements DAO {
         }
     }
 
+    public String getTableName() {
+        return gameTitle + "results";
+    }
+
     @Override
     public void postResult(int result, int playerId) {
-        String tableName = gameTitle + "results";
-        String queryString = "INSERT INTO " + tableName + " (result, player) VALUES(?,?)";
-        if (!tableExists(tableName)) {
-            createTable(tableName);
+        String queryString = "INSERT INTO " + getTableName() + " (result, player) VALUES(?,?)";
+        if (!tableExists()) {
+            createTable();
         }
         try {
             postResult = connection.prepareStatement(queryString);
@@ -78,11 +84,10 @@ public class DAOImpl implements DAO {
 
     @Override
     public List<PlayerAverage> getTopTen() {
-        String tableName = gameTitle + "results";
         List<PlayerAverage> list = new ArrayList<>();
         String queryString = "SELECT name, AVG(result) as Average " +
                 "FROM players " +
-                "JOIN " + tableName + " ON players.id = " + tableName + ".player " +
+                "JOIN " + getTableName() + " ON players.id = " + getTableName() + ".player " +
                 "WHERE result > 0 " +
                 "GROUP BY players.id " +
                 "ORDER BY Average LIMIT 10";
