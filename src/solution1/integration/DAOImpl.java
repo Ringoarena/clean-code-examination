@@ -9,17 +9,12 @@ import java.util.*;
 public class DAOImpl implements DAO {
     Connection connection;
     PreparedStatement login, postResult, getTopTen;
-    Map<String, String> gameTable = new HashMap<>();
     String gameTitle;
 
     public DAOImpl() {
-        gameTable.put("bc", "bcresults");
-        gameTable.put("hilo", "hiloresults");
-
         try {
             connection = DriverManager.getConnection("jdbc:mysql://localhost/cleancodeexam", "root", "root");
             login = connection.prepareStatement("SELECT * FROM players WHERE name = ?");
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -41,9 +36,36 @@ public class DAOImpl implements DAO {
         return user;
     }
 
+    public boolean tableExists(String tableName) {
+        try {
+            return connection.getMetaData().getTables(null, null, tableName, null).next();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void createTable(String tableName) {
+        String sql = "CREATE TABLE `cleancodeexam`.`" + tableName + "` (" +
+                "  `id` INT NOT NULL AUTO_INCREMENT," +
+                "  `result` INT NOT NULL," +
+                "  `player` INT NULL," +
+                "  PRIMARY KEY (`id`)," +
+                "  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);";
+        try {
+            Statement createTable = connection.createStatement();
+            createTable.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void postResult(int result, int playerId) {
-        String queryString = "INSERT INTO " + gameTable.get(gameTitle) + " (result, player) VALUES(?,?)";
+        String tableName = gameTitle + "results";
+        String queryString = "INSERT INTO " + tableName + " (result, player) VALUES(?,?)";
+        if (!tableExists(tableName)) {
+            createTable(tableName);
+        }
         try {
             postResult = connection.prepareStatement(queryString);
             postResult.setInt(1, result);
@@ -56,10 +78,11 @@ public class DAOImpl implements DAO {
 
     @Override
     public List<PlayerAverage> getTopTen() {
+        String tableName = gameTitle + "results";
         List<PlayerAverage> list = new ArrayList<>();
         String queryString = "SELECT name, AVG(result) as Average " +
                 "FROM players " +
-                "JOIN " + gameTable.get(gameTitle) + " ON players.id = " + gameTable.get(gameTitle) + ".player " +
+                "JOIN " + tableName + " ON players.id = " + tableName + ".player " +
                 "WHERE result > 0 " +
                 "GROUP BY players.id " +
                 "ORDER BY Average LIMIT 10";

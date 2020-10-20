@@ -15,12 +15,12 @@ import java.util.Map;
 public class Application {
     public static void main(String[] args) {
         DAO dao = new DAOImpl();
+        UserInterface ui = new SimpleWindow("Game UI");
 
         Map<String, GameLogic> games = new HashMap<>();
         games.put("bc", new BCGameLogic());
         games.put("hilo", new HiLoGameLogic());
 
-        UserInterface ui = new SimpleWindow("Game UI");
         GameController controller = new GameController(dao, games, ui);
         controller.run();
     }

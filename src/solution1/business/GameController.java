@@ -8,10 +8,10 @@ import java.util.Optional;
 
 public class GameController {
     DAO dao;
-    String gameTitle;
-    Map<String, GameLogic> games;
     GameLogic gameLogic;
     UserInterface ui;
+    Map<String, GameLogic> games;
+    String gameTitle;
     User currentUser;
     int nGuess;
     String answer;
@@ -25,11 +25,11 @@ public class GameController {
     }
 
     public void run() {
-        chooseGame();
         while (currentUser == null) {
             login();
         }
         while (continuePlaying) {
+            chooseGame();
             initiateGame();
             playGame();
             dao.postResult(nGuess, currentUser.getId());
@@ -40,6 +40,8 @@ public class GameController {
     }
 
     public void chooseGame() {
+        gameTitle = null;
+        ui.clear();
         while (!games.containsKey(gameTitle)) {
             ui.addString("Pick a game from the list!\n");
             games.keySet().forEach(s -> ui.addString(s + "\n"));
@@ -103,24 +105,8 @@ public class GameController {
         return nGuess;
     }
 
-    public void setnGuess(int nGuess) {
-        this.nGuess = nGuess;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
-
     public String getGuess() {
         return guess;
-    }
-
-    public void setGuess(String guess) {
-        this.guess = guess;
     }
 
     public User getCurrentUser() {
