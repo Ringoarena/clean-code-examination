@@ -36,18 +36,23 @@ public class DAOImpl implements DAO {
         return user;
     }
 
+    @Override
+    public void postResult(int result, int playerId) {
+        if (!tableExists()) {
+            createTable();
+        }
+        post(result, playerId);
+    }
+    
     public boolean tableExists() {
         try {
-            boolean exists = connection.getMetaData().getTables(null, null, getTableName(), null).next();
-            System.out.println("Table " + getTableName() + " exists: " + exists);
-            return exists;
+            return connection.getMetaData().getTables(null, null, getTableName(), null).next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void createTable() {
-        System.out.println("Creating table " + getTableName() + "...");
         String sql = "CREATE TABLE `cleancodeexam`.`" + getTableName() + "` (" +
                 "  `id` INT NOT NULL AUTO_INCREMENT," +
                 "  `result` INT NOT NULL," +
@@ -62,16 +67,8 @@ public class DAOImpl implements DAO {
         }
     }
 
-    public String getTableName() {
-        return gameTitle + "results";
-    }
-
-    @Override
-    public void postResult(int result, int playerId) {
+    private void post(int result, int playerId) {
         String queryString = "INSERT INTO " + getTableName() + " (result, player) VALUES(?,?)";
-        if (!tableExists()) {
-            createTable();
-        }
         try {
             postResult = connection.prepareStatement(queryString);
             postResult.setInt(1, result);
@@ -81,6 +78,8 @@ public class DAOImpl implements DAO {
             throw new RuntimeException(e);
         }
     }
+
+
 
     @Override
     public List<PlayerAverage> getTopTen() {
@@ -106,4 +105,9 @@ public class DAOImpl implements DAO {
     public void setGameTitle(String gameTitle) {
         this.gameTitle = gameTitle;
     }
+
+    public String getTableName() {
+        return gameTitle + "results";
+    }
+
 }
