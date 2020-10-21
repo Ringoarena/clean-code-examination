@@ -43,7 +43,7 @@ public class DAOImpl implements DAO {
         }
         post(result, playerId);
     }
-    
+
     public boolean tableExists() {
         try {
             return connection.getMetaData().getTables(null, null, getTableName(), null).next();
@@ -79,8 +79,6 @@ public class DAOImpl implements DAO {
         }
     }
 
-
-
     @Override
     public List<PlayerAverage> getTopTen() {
         List<PlayerAverage> list = new ArrayList<>();
@@ -102,6 +100,7 @@ public class DAOImpl implements DAO {
         return list;
     }
 
+    @Override
     public void setGameTitle(String gameTitle) {
         this.gameTitle = gameTitle;
     }
