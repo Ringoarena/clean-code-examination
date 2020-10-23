@@ -37,7 +37,7 @@ public class DAOImpl implements DAO {
     }
 
     @Override
-    public void postResult(int result, int playerId) {
+    public void addResult(int result, int playerId) {
         if (!tableExists()) {
             createTable();
         }

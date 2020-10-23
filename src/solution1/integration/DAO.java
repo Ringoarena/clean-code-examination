@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface DAO {
     Optional<User> loginByName(String name);
 
-    void postResult(int result, int playerId);
+    void addResult(int result, int playerId);
 
     List<PlayerAverage> getTopTen();
 

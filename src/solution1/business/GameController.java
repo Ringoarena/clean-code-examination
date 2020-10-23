@@ -32,7 +32,7 @@ public class GameController {
             chooseGame();
             initiateGame();
             playGame();
-            dao.postResult(nGuess, currentUser.getId());
+            dao.addResult(nGuess, currentUser.getId());
             showTopTen();
             confirmContinue();
         }
